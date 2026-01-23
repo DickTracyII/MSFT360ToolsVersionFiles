@@ -1,8 +1,7 @@
 {
-    "latestVersion": "1.5.1",
+    "latestVersion": "1.5.0",
     "releaseDate": "2026-01-22",
     "VersionHistory": {
-        "1.5.1": "Fixed issue with timesheet split view not saving correctly.",
         "1.5.0": "Added timesheet split view option; improved over-utilization alert handling.",
         "1.4.6": "Fixed bug with preview mode toggle.",
         "1.4.5": "Introduced preview mode for new features.",
