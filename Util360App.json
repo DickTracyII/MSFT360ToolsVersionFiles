@@ -1,0 +1,14 @@
+{
+    "latestVersion": "1.5.1",
+    "releaseDate": "2026-01-22",
+    "VersionHistory": {
+        "1.5.1": "Fixed issue with over-utilization alert dismissal not persisting correctly.",
+        "1.5.0": "Added timesheet split view option; improved over-utilization alert handling.",
+        "1.4.6": "Fixed bug with preview mode toggle.",
+        "1.4.5": "Introduced preview mode for new features.",
+        "1.3.5": "Performance improvements and minor bug fixes.",
+        "1.3.0": "Added customer analytics dashboard.",
+        "1.2.0": "Improved timesheet management features.",
+        "1.1.0": "Initial public release with core functionality."
+    }
+}
