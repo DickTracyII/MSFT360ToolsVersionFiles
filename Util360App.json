@@ -2,7 +2,8 @@
     "latestVersion": "1.5.3",
     "releaseDate": "2026-02-20",
     "VersionHistory": {
-        "1.5.2": "Enhanced Tracker and forecast, security updates, and fixed date selection",
+        "1.5.3": "Enhanced Tracker and forecast, security updates, and fixed date selection",
+        "1.5.2": "Split several bugs fixes and improvements.",
         "1.5.1": "major bug fixes and performance improvements.",
         "1.5.0": "Added timesheet split view option; improved over-utilization alert handling.",
         "1.4.6": "Fixed bug with preview mode toggle.",
