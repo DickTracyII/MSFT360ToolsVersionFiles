@@ -1,7 +1,8 @@
 {
-    "latestVersion": "1.5.3",
-    "releaseDate": "2026-02-20",
+    "latestVersion": "1.5.4",
+    "releaseDate": "2026-02-25",
     "VersionHistory": {
+        "1.5.4": "Fixed several bugs with customer id and tracker and improved user interface.",
         "1.5.3": "Enhanced Tracker and forecast, security updates, and fixed date selection",
         "1.5.2": "Split several bugs fixes and improvements.",
         "1.5.1": "major bug fixes and performance improvements.",
