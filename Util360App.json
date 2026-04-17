@@ -1,7 +1,8 @@
 {
-    "latestVersion": "1.5.7",
-    "releaseDate": "2026-04-13",
+    "latestVersion": "1.5.8",
+    "releaseDate": "2026-04-17",
     "VersionHistory": {
+        "1.5.8": "Minor bug fixes and performance improvements.",
         "1.5.7": "Touchscreen support, customer grouping, and major code quality improvements",
         "1.5.6": "Enhanced timesheet with fiscal year search, consistent billable hours calculations, and removed CUI keywords",
         "1.5.5": "Fixed bug with forecast vs actual calculation and updated widget registry. Added preview to modeler",
