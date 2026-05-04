@@ -1,7 +1,8 @@
 {
-    "latestVersion": "1.5.9",
-    "releaseDate": "2026-04-20",
+    "latestVersion": "1.6.0",
+    "releaseDate": "2026-05-04",
     "VersionHistory": {
+        "1.6.0": "Added new resource allocation dashboard and enhanced forecasting algorithms.",
         "1.5.9": "Fixed bug with SAP import and fixed first run setup.",
         "1.5.8": "Minor bug fixes and performance improvements.",
         "1.5.7": "Touchscreen support, customer grouping, and major code quality improvements",
