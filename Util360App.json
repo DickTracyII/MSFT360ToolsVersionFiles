@@ -1,7 +1,8 @@
 {
-    "latestVersion": "1.6.3",
-    "releaseDate": "2026-06-07",
+    "latestVersion": "1.6.4",
+    "releaseDate": "2026-06-17",
     "VersionHistory": {
+        "1.6.4": "Hotfix for critical bug in Manager360 export synchronization.",
         "1.6.3": "Added Manager360 export synchronization. New modeler with phases.",
         "1.6.0": "Added new resource allocation dashboard and enhanced forecasting algorithms.",
         "1.5.9": "Fixed bug with SAP import and fixed first run setup.",
