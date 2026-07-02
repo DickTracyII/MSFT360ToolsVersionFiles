@@ -1,7 +1,8 @@
 {
-    "latestVersion": "1.6.4",
-    "releaseDate": "2026-06-17",
+    "latestVersion": "1.6.5",
+    "releaseDate": "2026-06-19",
     "VersionHistory": {
+        "1.6.5": "Time off notifications for all PTO, working-day reminder window, and motivation quote fixes for non-working days.",
         "1.6.4": "Hotfix for critical bug in Manager360 export synchronization.",
         "1.6.3": "Added Manager360 export synchronization. New modeler with phases.",
         "1.6.0": "Added new resource allocation dashboard and enhanced forecasting algorithms.",
