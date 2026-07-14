@@ -4,6 +4,5 @@
     "VersionHistory": {
         "1.0.1": "Minor updates and bug fixes. Added exports for subordinates and team stats",
         "1.0.0": "First release. Team management and utilization, customer alignment, time off tracking, forecasting and more"
-
     }
 }
