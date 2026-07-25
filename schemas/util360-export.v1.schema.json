@@ -1,0 +1,421 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://msft360tools/schemas/util360-export.v1.json",
+  "title": "Util360 -> Manager360 Export (v1)",
+  "description": "Shared envelope schema for Util360App exports consumed by Manager360App. Defensive limits on dates, hours, and string lengths prevent crashes from corrupted or hand-edited payloads.",
+  "$comment": "Forward-compatibility policy: within schema major version 1, objects use additionalProperties:true so an older consumer tolerates (ignores) newer optional fields added by a newer producer instead of hard-rejecting the whole import. Known fields are still strictly validated for type/range/required. Breaking changes bump the MAJOR version, which the importer gates on separately.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "util360_app_version",
+    "exported_at",
+    "employee_alias",
+    "fiscal_year",
+    "fiscal_year_start",
+    "fiscal_year_end",
+    "data_range_start",
+    "data_range_end",
+    "payload_hash",
+    "row_counts",
+    "sheets"
+  ],
+  "properties": {
+    "schema_version":      { "type": "string", "pattern": "^1\\.[0-9]+$" },
+    "util360_app_version": { "type": "string", "maxLength": 40, "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([\\-+][0-9A-Za-z.\\-]+)?$" },
+    "exported_at":         { "type": "string", "format": "date-time", "maxLength": 40 },
+
+    "employee_alias":         { "$ref": "#/$defs/alias" },
+    "employee_display_name":  { "type": "string", "maxLength": 160 },
+    "employee_email":         { "type": "string", "format": "email", "maxLength": 320 },
+    "employee_role":          { "type": "string", "maxLength": 120 },
+    "employee_manager_alias": { "$ref": "#/$defs/optionalAlias" },
+    "employee_manager_name":  { "type": "string", "maxLength": 160 },
+    "employee_manager_email": { "type": "string", "format": "email", "maxLength": 320 },
+
+    "fiscal_year":        { "type": "integer", "minimum": 2020, "maximum": 2100 },
+    "fiscal_year_start":  { "$ref": "#/$defs/safeDate" },
+    "fiscal_year_end":    { "$ref": "#/$defs/safeDate" },
+    "data_range_start":   { "$ref": "#/$defs/safeDate" },
+    "data_range_end":     { "$ref": "#/$defs/safeDate" },
+
+    "payload_hash":       { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+
+    "row_counts": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "profile":         { "$ref": "#/$defs/rowCount" },
+        "profilenotes":    { "$ref": "#/$defs/rowCount" },
+        "settings":        { "$ref": "#/$defs/rowCount" },
+        "customers":       { "$ref": "#/$defs/rowCount" },
+        "timesheet":       { "$ref": "#/$defs/rowCount" },
+        "forecasts":       { "$ref": "#/$defs/rowCount" },
+        "customermetrics": { "$ref": "#/$defs/rowCount" },
+        "plannedtimeoff":  { "$ref": "#/$defs/rowCount" },
+        "weeklyrollup":    { "$ref": "#/$defs/rowCount" },
+        "monthlyrollup":   { "$ref": "#/$defs/rowCount" },
+        "modelerphaseplan":{ "$ref": "#/$defs/rowCount" }
+      }
+    },
+
+    "sheets": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["Profile", "Settings", "Customers", "Timesheet"],
+      "properties": {
+        "Profile":         { "type": "array", "maxItems": 5000,   "items": { "$ref": "#/$defs/profileItem" } },
+        "ProfileNotes":    { "type": "array", "maxItems": 5000,   "items": { "$ref": "#/$defs/profileNote" } },
+        "Settings":        { "type": "array", "minItems": 1, "maxItems": 1, "items": { "$ref": "#/$defs/settings" } },
+        "Customers":       { "type": "array", "maxItems": 2000,   "items": { "$ref": "#/$defs/customer" } },
+        "Timesheet":       { "type": "array", "maxItems": 100000, "items": { "$ref": "#/$defs/timesheetEntry" } },
+        "Forecasts":       { "type": "array", "maxItems": 100000, "items": { "$ref": "#/$defs/forecastEntry" } },
+        "CustomerMetrics": { "type": "array", "maxItems": 5000,   "items": { "$ref": "#/$defs/customerMetric" } },
+        "PlannedTimeOff":  { "type": "array", "maxItems": 2000,   "items": { "$ref": "#/$defs/plannedTimeOff" } },
+        "WeeklyRollup":    { "type": "array", "maxItems": 600,    "items": { "$ref": "#/$defs/weeklyRollup" } },
+        "MonthlyRollup":   { "type": "array", "maxItems": 240,    "items": { "$ref": "#/$defs/monthlyRollup" } },
+        "ModelerPhasePlan":{ "type": "array", "maxItems": 200,    "items": { "$ref": "#/$defs/modelerPhasePlanPhase" } }
+      }
+    }
+  },
+
+  "$defs": {
+    "alias": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 32,
+      "pattern": "^[A-Za-z0-9._-]{2,32}$"
+    },
+    "optionalAlias": {
+      "type": "string",
+      "description": "An alias, or empty string. The manager alias is optional metadata that Util360 leaves blank when the user has not set their manager; a blank value must not fail the whole import.",
+      "maxLength": 32,
+      "pattern": "^$|^[A-Za-z0-9._-]{2,32}$"
+    },
+    "safeDate": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO date YYYY-MM-DD constrained to 2000-01-01 .. 2100-12-31.",
+      "pattern": "^(20[0-9]{2}|2100)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+    },
+    "optionalDate": {
+      "type": "string",
+      "description": "safeDate or empty string (modeled customers may omit billing dates).",
+      "pattern": "^$|^(20[0-9]{2}|2100)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+    },
+    "safeDateTime": {
+      "type": "string",
+      "description": "ISO datetime (with or without seconds/timezone), year constrained 2000..2100.",
+      "pattern": "^(20[0-9]{2}|2100)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?(\\.[0-9]{1,3})?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])?$",
+      "maxLength": 40
+    },
+    "rowCount":    { "type": "integer", "minimum": 0, "maximum": 1000000 },
+    "bit":         { "type": "integer", "enum": [0, 1] },
+    "dailyHours":  { "type": "number", "minimum": 0,      "maximum": 24    },
+    "weeklyHours": { "type": "number", "minimum": 0,      "maximum": 168   },
+    "monthlyHours":{ "type": "number", "minimum": 0,      "maximum": 744   },
+    "annualHours": { "type": "number", "minimum": 0,      "maximum": 10000 },
+    "signedHours": { "type": "number", "minimum": -10000, "maximum": 10000 },
+    "percent":     { "type": "number", "minimum": 0,      "maximum": 100   },
+
+    "modelerPhaseAllocation": {
+      "type": "object",
+      "additionalProperties": true,
+      "anyOf": [
+        { "required": ["project_id"] },
+        { "required": ["scenario_ref"] }
+      ],
+      "properties": {
+        "project_id":     { "type": "string", "maxLength": 120 },
+        "scenario_ref":   { "type": "string", "maxLength": 120 },
+        "customer":       { "type": "string", "maxLength": 200 },
+        "hours_per_week": { "$ref": "#/$defs/weeklyHours" }
+      }
+    },
+
+    "modelerScenarioCustomer": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["scenario_ref"],
+      "properties": {
+        "scenario_ref":   { "type": "string", "maxLength": 120 },
+        "customer":       { "type": "string", "maxLength": 200 },
+        "start_date":     { "$ref": "#/$defs/optionalDate" },
+        "end_date":       { "$ref": "#/$defs/optionalDate" },
+        "hours_assigned": { "$ref": "#/$defs/annualHours" }
+      }
+    },
+
+    "modelerPhasePlanPhase": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["start_date", "end_date"],
+      "properties": {
+        "scenario_id": { "type": "string", "maxLength": 64 },
+        "plan_name":   { "type": "string", "maxLength": 255 },
+        "phase_id":    { "type": "string", "maxLength": 64 },
+        "phase_index": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "start_date":  { "$ref": "#/$defs/safeDate" },
+        "end_date":    { "$ref": "#/$defs/safeDate" },
+        "allocations": {
+          "type": "array",
+          "maxItems": 500,
+          "items": { "$ref": "#/$defs/modelerPhaseAllocation" }
+        },
+        "scenario_customers": {
+          "type": "array",
+          "maxItems": 500,
+          "items": { "$ref": "#/$defs/modelerScenarioCustomer" }
+        }
+      }
+    },
+
+    "profileNote": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "note":          { "type": "string", "maxLength": 20000 },
+        "created_at":    { "type": "string", "maxLength": 40 },
+        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+
+    "profileItem": {
+      "type": "object",
+      "required": ["type"],
+      "properties": { "type": { "type": "string" } },
+      "oneOf": [
+        { "$ref": "#/$defs/profile.accreditation" },
+        { "$ref": "#/$defs/profile.certification" },
+        { "$ref": "#/$defs/profile.skill" },
+        { "$ref": "#/$defs/profile.mentee" },
+        { "$ref": "#/$defs/profile.aspirations" },
+        { "$ref": "#/$defs/profile.photo" },
+        { "$ref": "#/$defs/profile.timetool" },
+        { "$ref": "#/$defs/profile.title" }
+      ]
+    },
+
+    "profile.accreditation": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type", "name"],
+      "properties": {
+        "type":          { "const": "accreditation" },
+        "name":          { "type": "string", "maxLength": 200 },
+        "date_earned":   { "$ref": "#/$defs/safeDate" },
+        "status":        { "type": "string", "maxLength": 40 },
+        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+    "profile.certification": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type", "name"],
+      "properties": {
+        "type":                 { "const": "certification" },
+        "name":                 { "type": "string", "maxLength": 200 },
+        "examid":               { "type": "string", "maxLength": 40 },
+        "certification_number": { "type": "string", "maxLength": 80 },
+        "date_earned":          { "$ref": "#/$defs/safeDate" },
+        "expiration":           { "$ref": "#/$defs/safeDate" },
+        "display_order":        { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+    "profile.skill": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type", "name"],
+      "properties": {
+        "type":          { "const": "skill" },
+        "name":          { "type": "string", "maxLength": 120 },
+        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+    "profile.mentee": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type", "name"],
+      "properties": {
+        "type":          { "const": "mentee" },
+        "name":          { "type": "string", "maxLength": 160 },
+        "category":      { "type": "string", "maxLength": 80 },
+        "started":       { "$ref": "#/$defs/safeDate" },
+        "ended":         { "$ref": "#/$defs/safeDate" },
+        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+    "profile.aspirations": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type"],
+      "properties": {
+        "type":          { "const": "aspirations" },
+        "aspirations":   { "type": "string", "maxLength": 5000 },
+        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+    "profile.photo": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type"],
+      "properties": {
+        "type":          { "const": "photo" },
+        "name":          {
+          "type": "string",
+          "maxLength": 7000000,
+          "pattern": "^(data:image/[a-zA-Z0-9.+-]+;base64,)?[A-Za-z0-9+/=\\s]*$"
+        },
+        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+    "profile.timetool": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type", "name"],
+      "properties": {
+        "type":          { "const": "timetool" },
+        "name":          { "type": "string", "maxLength": 80 },
+        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+    "profile.title": {
+      "type": "object", "additionalProperties": true,
+      "required": ["type", "name"],
+      "properties": {
+        "type":          { "const": "title" },
+        "name":          { "type": "string", "maxLength": 120 },
+        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+
+    "settings": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "annual_target_hours":     { "$ref": "#/$defs/annualHours" },
+        "target_weekly_hours":     { "$ref": "#/$defs/weeklyHours" },
+        "adjustable_weekly_hours": { "$ref": "#/$defs/weeklyHours" },
+        "working_days":            {
+          "type": "string",
+          "maxLength": 60,
+          "pattern": "^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)(,(Sun|Mon|Tue|Wed|Thu|Fri|Sat))*$"
+        },
+        "allow_holiday_billing":   { "$ref": "#/$defs/bit" },
+        "fiscal_year_periods":     {
+          "type": "string",
+          "enum": ["halves", "quarters", "months", "weeks", "year"]
+        },
+        "timezone":                { "type": "string", "maxLength": 80 }
+      }
+    },
+
+    "customer": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["customer", "project_id"],
+      "properties": {
+        "customer":                     { "type": "string", "minLength": 1, "maxLength": 200 },
+        "project_id":                   { "type": "string", "minLength": 1, "maxLength": 100 },
+        "project_name":                 { "type": "string", "maxLength": 300 },
+        "start_billing_date":           { "$ref": "#/$defs/safeDate" },
+        "last_billing_date":            { "$ref": "#/$defs/safeDate" },
+        "technology_support":           { "type": "string", "maxLength": 2000 },
+        "hours_assigned":               { "$ref": "#/$defs/signedHours" },
+        "hours_billed_last_fiscal":     { "$ref": "#/$defs/signedHours" },
+        "hours_billed_ytd":             { "$ref": "#/$defs/signedHours" },
+        "hours_remaining":              { "$ref": "#/$defs/signedHours" },
+        "fiscal_start_remaining_hours": { "$ref": "#/$defs/signedHours" },
+        "total_workdays":               { "type": "integer", "minimum": 0, "maximum": 400 },
+        "workdays_remaining":           { "type": "integer", "minimum": 0, "maximum": 400 },
+        "avg_hours_per_day":            { "$ref": "#/$defs/dailyHours" },
+        "avg_hours_per_month":          { "$ref": "#/$defs/monthlyHours" },
+        "catch_up_per_workday":         { "$ref": "#/$defs/signedHours" },
+        "catch_up_difference":          { "$ref": "#/$defs/signedHours" },
+        "fy_burnable_hours":            { "$ref": "#/$defs/signedHours" }
+      }
+    },
+
+    "timesheetEntry": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["date", "hours"],
+      "properties": {
+        "date":          { "$ref": "#/$defs/safeDate" },
+        "hours":         { "$ref": "#/$defs/dailyHours" },
+        "project_id":    { "type": "string", "maxLength": 100 },
+        "customer":      { "type": "string", "maxLength": 200 },
+        "is_billable":          { "$ref": "#/$defs/bit" },
+        "billable_type":        { "type": "string", "maxLength": 80 },
+        "nonbillable_category": { "type": "string", "maxLength": 80 },
+        "no_reason":            { "type": "string", "maxLength": 200 },
+        "assignment":           { "type": "string", "maxLength": 200 },
+        "logged_in_sap":        { "type": "integer", "minimum": 0, "maximum": 99 },
+        "start_time":           { "$ref": "#/$defs/safeDateTime" },
+        "end_time":             { "$ref": "#/$defs/safeDateTime" },
+        "notes":                { "type": "string", "maxLength": 5000 }
+      }
+    },
+
+    "forecastEntry": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["date"],
+      "properties": {
+        "date":             { "$ref": "#/$defs/safeDate" },
+        "project_id":       { "type": "string", "maxLength": 100 },
+        "customer":         { "type": "string", "maxLength": 200 },
+        "forecasted_hours": { "$ref": "#/$defs/dailyHours" }
+      }
+    },
+
+    "customerMetric": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["project_id"],
+      "properties": {
+        "project_id": { "type": "string", "maxLength": 100 },
+        "customer":   { "type": "string", "maxLength": 200 },
+        "notes":      { "type": "string", "maxLength": 5000 }
+      }
+    },
+
+    "plannedTimeOff": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["start_date", "end_date"],
+      "properties": {
+        "start_date":    { "$ref": "#/$defs/safeDate" },
+        "end_date":      { "$ref": "#/$defs/safeDate" },
+        "time_off_type": { "type": "string", "maxLength": 60 },
+        "description":   { "type": "string", "maxLength": 5000 },
+        "hours":         { "type": "number", "minimum": 0, "maximum": 2000 },
+        "days":          { "type": "number", "minimum": 0, "maximum": 366 }
+      }
+    },
+
+    "weeklyRollup": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["iso_year", "iso_week"],
+      "properties": {
+        "iso_year":          { "type": "integer", "minimum": 2020, "maximum": 2100 },
+        "iso_week":          { "type": "integer", "minimum": 1, "maximum": 53 },
+        "week_start_date":   { "$ref": "#/$defs/safeDate" },
+        "week_end_date":     { "$ref": "#/$defs/safeDate" },
+        "total_hours":       { "$ref": "#/$defs/weeklyHours" },
+        "billable_hours":    { "$ref": "#/$defs/weeklyHours" },
+        "nonbillable_hours": { "$ref": "#/$defs/weeklyHours" },
+        "holiday_hours":     { "$ref": "#/$defs/weeklyHours" },
+        "target_hours":      { "$ref": "#/$defs/weeklyHours" }
+      }
+    },
+
+    "monthlyRollup": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["year", "month"],
+      "properties": {
+        "year":              { "type": "integer", "minimum": 2020, "maximum": 2100 },
+        "month":             { "type": "integer", "minimum": 1, "maximum": 12 },
+        "total_hours":       { "$ref": "#/$defs/monthlyHours" },
+        "billable_hours":    { "$ref": "#/$defs/monthlyHours" },
+        "nonbillable_hours": { "$ref": "#/$defs/monthlyHours" },
+        "target_hours":      { "$ref": "#/$defs/monthlyHours" }
+      }
+    }
+  }
+}
