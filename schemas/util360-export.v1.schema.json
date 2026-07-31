@@ -181,104 +181,24 @@
     },
 
     "profileItem": {
+      "$comment": "Profile items are OPTIONAL, supplementary insight for Manager360 (skills, certifications, accreditations, mentees, aspirations, headshot, job title, and any future/legacy kinds). They enrich a manager's view but are never required for an import to succeed. This definition is intentionally permissive: ANY object shape is accepted, with NO required properties and NO per-type variant matching, so a placeholder, legacy, partially-filled, or unknown-type profile row can never reject the whole export. Known fields still receive defensive type/length caps WHEN PRESENT (to guard against corrupted or hand-edited payloads); unknown fields are tolerated via additionalProperties.",
       "type": "object",
-      "required": ["type"],
-      "properties": { "type": { "type": "string" } },
-      "oneOf": [
-        { "$ref": "#/$defs/profile.accreditation" },
-        { "$ref": "#/$defs/profile.certification" },
-        { "$ref": "#/$defs/profile.skill" },
-        { "$ref": "#/$defs/profile.mentee" },
-        { "$ref": "#/$defs/profile.aspirations" },
-        { "$ref": "#/$defs/profile.photo" },
-        { "$ref": "#/$defs/profile.timetool" },
-        { "$ref": "#/$defs/profile.title" }
-      ]
-    },
-
-    "profile.accreditation": {
-      "type": "object", "additionalProperties": true,
-      "required": ["type", "name"],
+      "additionalProperties": true,
       "properties": {
-        "type":          { "const": "accreditation" },
-        "name":          { "type": "string", "maxLength": 200 },
-        "date_earned":   { "$ref": "#/$defs/safeDate" },
-        "status":        { "type": "string", "maxLength": 40 },
-        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
-      }
-    },
-    "profile.certification": {
-      "type": "object", "additionalProperties": true,
-      "required": ["type", "name"],
-      "properties": {
-        "type":                 { "const": "certification" },
-        "name":                 { "type": "string", "maxLength": 200 },
+        "type":                 { "type": "string", "maxLength": 80 },
+        "name":                 { "type": "string", "maxLength": 7000000 },
+        "skill":                { "type": "string", "maxLength": 200 },
+        "category":             { "type": "string", "maxLength": 120 },
+        "aspirations":          { "type": "string", "maxLength": 5000 },
         "examid":               { "type": "string", "maxLength": 40 },
         "certification_number": { "type": "string", "maxLength": 80 },
-        "date_earned":          { "$ref": "#/$defs/safeDate" },
-        "expiration":           { "$ref": "#/$defs/safeDate" },
+        "date_earned":          { "$ref": "#/$defs/optionalDate" },
+        "expiration":           { "$ref": "#/$defs/optionalDate" },
+        "status":               { "type": "string", "maxLength": 40 },
+        "source":               { "type": "string", "maxLength": 200 },
+        "started":              { "$ref": "#/$defs/optionalDate" },
+        "ended":                { "$ref": "#/$defs/optionalDate" },
         "display_order":        { "type": "integer", "minimum": 0, "maximum": 100000 }
-      }
-    },
-    "profile.skill": {
-      "type": "object", "additionalProperties": true,
-      "required": ["type", "name"],
-      "properties": {
-        "type":          { "const": "skill" },
-        "name":          { "type": "string", "maxLength": 120 },
-        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
-      }
-    },
-    "profile.mentee": {
-      "type": "object", "additionalProperties": true,
-      "required": ["type", "name"],
-      "properties": {
-        "type":          { "const": "mentee" },
-        "name":          { "type": "string", "maxLength": 160 },
-        "category":      { "type": "string", "maxLength": 80 },
-        "started":       { "$ref": "#/$defs/safeDate" },
-        "ended":         { "$ref": "#/$defs/safeDate" },
-        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
-      }
-    },
-    "profile.aspirations": {
-      "type": "object", "additionalProperties": true,
-      "required": ["type"],
-      "properties": {
-        "type":          { "const": "aspirations" },
-        "aspirations":   { "type": "string", "maxLength": 5000 },
-        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
-      }
-    },
-    "profile.photo": {
-      "type": "object", "additionalProperties": true,
-      "required": ["type"],
-      "properties": {
-        "type":          { "const": "photo" },
-        "name":          {
-          "type": "string",
-          "maxLength": 7000000,
-          "pattern": "^(data:image/[a-zA-Z0-9.+-]+;base64,)?[A-Za-z0-9+/=\\s]*$"
-        },
-        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
-      }
-    },
-    "profile.timetool": {
-      "type": "object", "additionalProperties": true,
-      "required": ["type", "name"],
-      "properties": {
-        "type":          { "const": "timetool" },
-        "name":          { "type": "string", "maxLength": 80 },
-        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
-      }
-    },
-    "profile.title": {
-      "type": "object", "additionalProperties": true,
-      "required": ["type", "name"],
-      "properties": {
-        "type":          { "const": "title" },
-        "name":          { "type": "string", "maxLength": 120 },
-        "display_order": { "type": "integer", "minimum": 0, "maximum": 100000 }
       }
     },
 
