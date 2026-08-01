@@ -1,7 +1,8 @@
 {
-    "latestVersion": "1.0.2",
-    "releaseDate": "2026-07-25",
+    "latestVersion": "1.0.3",
+    "releaseDate": "2026-08-03",
     "VersionHistory": {
+        "1.0.3": "Added support for notes, improved performance and stability, and fixed sync errors",
         "1.0.2": "Encrypted database, update notifications, and import/alerts fixes",
         "1.0.1": "Minor updates and bug fixes. Added exports for subordinates and team stats",
         "1.0.0": "First release. Team management and utilization, customer alignment, time off tracking, forecasting and more"
