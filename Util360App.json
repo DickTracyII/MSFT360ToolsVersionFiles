@@ -1,7 +1,7 @@
 {
     "latestVersion": "1.7.0",
     "releaseDate": "2026-08-03",
-    "downloadId": "b82d0096-d95e-4d74-aad6-c385d05d963e",
+    "downloadId": "356dfe5a-c95c-4176-bb4a-21e3b5831b37",
     "VersionHistory": {
         "1.7.0": "Added support for notes, improved calculations, and fixed sync errors",
         "1.6.9": "Added Work Recorder time-tracking tool, staffing roles catalog, and Modeler auto-phase plus billing pace fixes.",
