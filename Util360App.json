@@ -1,7 +1,8 @@
 {
-    "latestVersion": "1.6.9",
-    "releaseDate": "2026-07-25",
+    "latestVersion": "1.7.0",
+    "releaseDate": "2026-08-04",
     "VersionHistory": {
+        "1.7.0": "Added support for notes, improved calculations, and fixed sync errors",
         "1.6.9": "Added Work Recorder time-tracking tool, staffing roles catalog, and Modeler auto-phase plus billing pace fixes.",
         "1.6.8": "Fixed critical bug with insights calculation and modaler features",
         "1.6.7": "Fixed critical customer bug for start dates and help modal",
