@@ -1,7 +1,7 @@
 {
     "latestVersion": "1.0.3",
     "releaseDate": "2026-08-03",
-    "downloadId": "dc55ca52%2D57c5%2D4401%2Dbe0d%2Dccfcd7ce4d04",
+    "downloadId": "b82d0096%2Dd95e%2D4d74%2Daad6%2Dc385d05d963e",
     "VersionHistory": {
         "1.0.3": "Added support for notes, improved performance and stability, and fixed sync errors",
         "1.0.2": "Encrypted database, update notifications, and import/alerts fixes",
